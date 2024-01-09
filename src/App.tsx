@@ -9,6 +9,13 @@ import { useAuth } from 'react-oidc-context'
 const App: React.FC = () => {
   const auth = useAuth()
 
+  React.useEffect(() => {
+    // the `return` is important - addAccessTokenExpiring() returns a cleanup function
+    return auth.events.addAccessTokenExpiring(() => {
+            auth.signinSilent();            
+    })
+}, [auth.events, auth.signinSilent])
+
   switch (auth.activeNavigator) {
     case 'signinSilent':
       return <div>Signing you in...</div>
@@ -32,12 +39,6 @@ const App: React.FC = () => {
   }
 
   if (auth.isAuthenticated) {
-    if (auth.user != undefined) {
-      console.log('set token to localStorage')
-      localStorage.setItem('todoApiAccessToken', auth.user.access_token)
-    }
-
-    console.log(auth.user)
     return (
       <>
         <div>
