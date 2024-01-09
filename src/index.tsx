@@ -5,13 +5,22 @@ import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AuthProvider } from 'react-oidc-context'
+import { User } from 'oidc-client-ts'
 
 const queryClient = new QueryClient()
+
+const onSigninCallback = (user: User | void) => {
+  if (user) {
+    localStorage.setItem('todoApiAccessToken', user.access_token)
+  }
+  window.history.replaceState({}, document.title, window.location.pathname)
+}
 
 const oidcConfig = {
   authority: 'http://localhost:7000/realms/TodoApp',
   client_id: 'todo-app-client',
   redirect_uri: 'http://localhost:3000/',
+  onSigninCallback: onSigninCallback,
 }
 
 const root = ReactDOM.createRoot(document.getElementById('app') as HTMLElement)
